@@ -267,3 +267,94 @@ export class AuthoringError extends Error {
     this.name = "AuthoringError";
   }
 }
+
+/** Remove one edge by id, or by the pair it connects. */
+export function removeEdge(
+  draft: WorkflowDraft,
+  spec: { edgeId?: string; source?: string; target?: string },
+): WorkflowDraft {
+  const matches = (e: FlowEdge): boolean =>
+    spec.edgeId
+      ? e.id === spec.edgeId
+      : e.source === spec.source && e.target === spec.target;
+
+  const hit = draft.graph.edges.filter(matches);
+  if (hit.length === 0) {
+    throw new AuthoringError(
+      spec.edgeId
+        ? `No edge "${spec.edgeId}" in "${draft.name}".`
+        : `No edge from "${spec.source}" to "${spec.target}" in "${draft.name}".`,
+    );
+  }
+
+  return { ...draft, graph: { ...draft.graph, edges: draft.graph.edges.filter((e) => !matches(e)) } };
+}
+
+/**
+ * One kind in full — schema, ports and defaults.
+ *
+ * Separate from the kinds listing because an agent authoring a node needs the
+ * FIELDS, and putting all of them on the list turns a vocabulary query into a
+ * payload nobody reads. The PHP twin splits it the same way.
+ */
+export function describeKind(name: string): {
+  kind: string;
+  title: string;
+  category: string;
+  description?: string;
+  defaults: Record<string, unknown>;
+  inputs: unknown;
+  outputs: unknown;
+  configSchema: unknown;
+} {
+  const kind = getNodeKind(name);
+  if (!kind) {
+    throw new AuthoringError(
+      `No node kind "${name}". Call the kinds tool to list what this host has registered.`,
+    );
+  }
+
+  return {
+    kind: kind.name,
+    title: kind.label,
+    category: kind.category,
+    description: kind.description,
+    defaults: defaultConfigFor(kind),
+    inputs: kind.inputs,
+    outputs: kind.outputs,
+    configSchema: kind.configSchema,
+  };
+}
+
+/**
+ * Read a WorkflowSchema document back into a draft.
+ *
+ * `lenient` deliberately: an agent importing a graph that references a kind
+ * this host has not registered should get a draft plus a reported issue, not a
+ * refusal. Refusing loses the other forty nodes to fix one, and `checkDraft`
+ * is the place that says "not runnable yet".
+ */
+export function fromDocument(
+  document: unknown,
+  spec: { id: string; name?: string },
+): { draft: WorkflowDraft; issues: AuthoringIssue[] } {
+  const result = importWorkflow(document as never, { lenient: true }) as {
+    graph: FlowGraph;
+    issues?: Array<{ message?: string; nodeId?: string; level?: string }>;
+  };
+
+  const issues: AuthoringIssue[] = (result.issues ?? []).map((i) => ({
+    source: "schema" as const,
+    level: i.level === "warning" ? ("warning" as const) : ("error" as const),
+    message: i.message ?? "Unreadable issue from importWorkflow.",
+    ...(i.nodeId ? { nodeId: i.nodeId } : {}),
+  }));
+
+  const name =
+    spec.name
+    ?? (typeof (document as { name?: unknown })?.name === "string"
+      ? ((document as { name: string }).name)
+      : "Imported workflow");
+
+  return { draft: { id: spec.id, name, graph: result.graph }, issues };
+}

@@ -1,22 +1,47 @@
 {
   "name": "@particle-academy/fancy-flow-mcp-js",
   "version": "0.1.0",
-  "description": "MCP server letting agents author fancy-flow graphs headlessly on a TypeScript host — the Node twin of fancy-flow-mcp.",
+  "description": "MCP server letting agents author fancy-flow graphs headlessly on a TypeScript host \u2014 the Node twin of fancy-flow-mcp.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./authoring": {
-      "import": { "types": "./dist/authoring.d.ts", "default": "./dist/authoring.js" },
-      "require": { "types": "./dist/authoring.d.cts", "default": "./dist/authoring.cjs" }
+      "import": {
+        "types": "./dist/authoring.d.ts",
+        "default": "./dist/authoring.js"
+      },
+      "require": {
+        "types": "./dist/authoring.d.cts",
+        "default": "./dist/authoring.cjs"
+      }
+    },
+    "./server": {
+      "import": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/server.d.cts",
+        "default": "./dist/server.cjs"
+      }
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -26,14 +51,24 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "tsup"
   },
-  "keywords": ["mcp", "fancy-flow", "workflow", "agent", "headless"],
-  "engines": { "node": ">=22" },
+  "keywords": [
+    "mcp",
+    "fancy-flow",
+    "workflow",
+    "agent",
+    "headless"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Particle-Academy/fancy-flow-mcp-js.git"
   },
   "license": "MIT",
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@particle-academy/fancy-flow": ">=0.66 <2.0"
   },
@@ -43,5 +78,15 @@
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^3.2.6"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.5.4"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
+  },
+  "bin": {
+    "fancy-flow-mcp-js": "./dist/stdio.js"
   }
 }

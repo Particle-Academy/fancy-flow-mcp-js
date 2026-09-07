@@ -1,19 +1,21 @@
 /**
  * `@particle-academy/fancy-flow-mcp-js` — the Node twin of `fancy-flow-mcp`.
  *
- * ## State: the authoring core is complete; the MCP transport is not written
+ * ## Two entry points, and the smaller one has no dependencies
  *
- * That is a deliberate ordering, not a half-finished package. The transport is
- * the only part needing a third-party dependency, and this kit requires owner
- * approval before any is added. The decision is open — specifically whether to
- * take `@modelcontextprotocol/sdk` (17 direct deps, most of them for the
- * HTTP+SSE transport a stdio server never uses) or build on a first-party
- * package that may already do the job.
+ * `./authoring` is the pure core: graph building, validation and the
+ * host-admission seam, importing nothing but `@particle-academy/fancy-flow`.
+ * A host with its own transport — or none — pays for nothing else.
  *
- * Everything below is unaffected by that decision, which is why it exists
- * first. Graph authoring, validation and the host-admission seam depend on
- * nothing but `@particle-academy/fancy-flow`, and a host that wants to author
- * graphs with its OWN transport — or none — can use this today.
+ * The root adds the MCP server, which is where `@modelcontextprotocol/sdk`
+ * enters. That split is deliberate and load-bearing: the SDK's 94 transitive
+ * packages exist mostly for an HTTP+SSE transport a stdio server never touches,
+ * so anyone who does not need a server should not carry them.
+ *
+ * The SDK was chosen over hand-rolled framing for ONE reason that outranks the
+ * dependency count: it speaks the same protocol revisions `laravel/mcp` does,
+ * and being the same protocol as the PHP twin is the entire point of this
+ * package.
  *
  * ## The split it is built around
  *
@@ -40,12 +42,18 @@
  * calls `runFlow` itself, with its own executors, on its own authority.
  */
 
+export { createFlowServer, MemoryDraftStore } from "./server";
+export type { FlowServerOptions } from "./server";
+
 export {
   addNode,
   authorableKinds,
   checkDraft,
   configureNode,
   connect,
+  describeKind,
+  fromDocument,
+  removeEdge,
   removeNode,
   toDocument,
   AuthoringError,
