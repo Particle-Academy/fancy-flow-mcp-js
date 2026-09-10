@@ -117,12 +117,28 @@ function mintId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${counter}`;
 }
 
+/**
+ * The version this server advertises when the host does not name one.
+ *
+ * It goes out in the `serverInfo` of every `initialize` response, so it is the
+ * number every connecting agent records and may gate on. It is a literal
+ * because this package builds to BOTH ESM and CJS: `import.meta.url` does not
+ * exist in the CommonJS output, so the runtime `package.json` read used by the
+ * CLI packages in this estate is not available here.
+ *
+ * `version.test.ts` pins it to `package.json` instead. That leaves the copy in
+ * place but removes its ability to drift unnoticed, which is the whole defect —
+ * every other version surface in this estate had gone stale exactly this way,
+ * and one of them told a user 0.1.0 from a 0.4.0 install for three releases.
+ */
+const DEFAULT_SERVER_VERSION = "0.1.0";
+
 export function createFlowServer(options: FlowServerOptions): McpServer {
   const { store, admits } = options;
 
   const server = new McpServer({
     name: options.serverInfo?.name ?? "fancy-flow-mcp-js",
-    version: options.serverInfo?.version ?? "0.1.0",
+    version: options.serverInfo?.version ?? DEFAULT_SERVER_VERSION,
   });
 
   /** Load a draft or hand the agent an error naming the id it asked for. */

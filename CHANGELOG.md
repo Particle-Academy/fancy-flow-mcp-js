@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **The advertised default server version is pinned to `package.json`.** It agrees today. Its PHP twin did not — stale at 0.1.0 against a 0.4.0 package — and nothing here would have noticed the same drift after the next release. `version.test.ts` pins the constant and checks the call site still uses it.
+
+
 ### Added
 
 - **The MCP server itself** — 15 tools, matching `fancy-flow-mcp` (PHP) name for
