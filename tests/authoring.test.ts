@@ -7,8 +7,7 @@
  * only thing asserted about it is that its answer is carried through TAGGED,
  * never merged into ours.
  */
-import { beforeEach, describe, expect, test } from "vitest";
-import { registerBuiltinKinds } from "@particle-academy/fancy-flow/registry";
+import { describe, expect, test } from "vitest";
 import {
   addNode,
   authorableKinds,
@@ -25,9 +24,6 @@ function draft(): WorkflowDraft {
   return { id: "w1", name: "Test flow", graph: { nodes: [], edges: [] } as never };
 }
 
-beforeEach(() => {
-  registerBuiltinKinds();
-});
 
 describe("authorableKinds", () => {
   test("reads the LIVE registry, not a hand-kept list", () => {

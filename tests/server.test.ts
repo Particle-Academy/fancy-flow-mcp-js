@@ -13,10 +13,9 @@
  * that the tools WORK, that one cares that they are the same tools the PHP
  * server offers.
  */
-import { beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { registerBuiltinKinds } from "@particle-academy/fancy-flow/registry";
 import { createFlowServer, MemoryDraftStore } from "../src/server";
 import type { DraftStore } from "../src/authoring";
 
@@ -41,9 +40,6 @@ async function call(client: Client, name: string, args: Record<string, unknown> 
   return { json: JSON.parse(content?.text ?? "{}"), isError: result.isError === true };
 }
 
-beforeEach(() => {
-  registerBuiltinKinds();
-});
 
 describe("the server is reachable at all", () => {
   test("lists its tools over the wire", async () => {

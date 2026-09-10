@@ -27,7 +27,6 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { registerBuiltinKinds } from "@particle-academy/fancy-flow/registry";
 import { createFlowServer, MemoryDraftStore } from "../src/server";
 
 const PHP_TOOLS_DIR = fileURLToPath(new URL("../../fancy-flow-mcp/src/Tools/", import.meta.url));
@@ -47,7 +46,6 @@ function phpToolNames(): string[] {
 }
 
 async function nodeToolNames(): Promise<string[]> {
-  registerBuiltinKinds();
 
   const server = createFlowServer({ store: new MemoryDraftStore() });
   const client = new Client({ name: "parity", version: "0" });

@@ -1,7 +1,7 @@
 {
   "name": "@particle-academy/fancy-flow-mcp-js",
   "version": "0.1.0",
-  "description": "MCP server letting agents author fancy-flow graphs headlessly on a TypeScript host \u2014 the Node twin of fancy-flow-mcp.",
+  "description": "MCP server letting agents author fancy-flow graphs headlessly on a TypeScript host — the Node twin of fancy-flow-mcp.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -77,7 +77,7 @@
     "@types/node": "^22.10.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
