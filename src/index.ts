@@ -7,15 +7,14 @@
  * host-admission seam, importing nothing but `@particle-academy/fancy-flow`.
  * A host with its own transport — or none — pays for nothing else.
  *
- * The root adds the MCP server, which is where `@modelcontextprotocol/sdk`
- * enters. That split is deliberate and load-bearing: the SDK's 94 transitive
- * packages exist mostly for an HTTP+SSE transport a stdio server never touches,
- * so anyone who does not need a server should not carry them.
+ * The root adds the MCP server, which is agent-integrations' first-party
+ * `MicroMcpServer` from its headless `/mcp` subpath. That subpath imports no
+ * package at all, so the server adds no third-party code and no React.
  *
- * The SDK was chosen over hand-rolled framing for ONE reason that outranks the
- * dependency count: it speaks the same protocol revisions `laravel/mcp` does,
- * and being the same protocol as the PHP twin is the entire point of this
- * package.
+ * 0.1.0 was built on `@modelcontextprotocol/sdk` instead, chosen because it
+ * speaks the protocol revisions `laravel/mcp` does. The SDK was refused as a
+ * dependency; the port negotiates the same revisions itself, and
+ * `tests/wire.test.ts` holds it to 0.1.0's replies, recorded frame by frame.
  *
  * ## The split it is built around
  *
@@ -43,7 +42,7 @@
  */
 
 export { createFlowServer, MemoryDraftStore } from "./server";
-export type { FlowServerOptions } from "./server";
+export type { FlowServer, FlowServerOptions } from "./server";
 
 export {
   addNode,

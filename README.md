@@ -29,21 +29,22 @@ real time chasing the wrong fix, so they are never merged.
 
 | Import | What it costs | Use it when |
 |---|---|---|
-| `@particle-academy/fancy-flow-mcp-js/authoring` | **nothing** beyond `fancy-flow` | You have your own transport, or none |
-| `@particle-academy/fancy-flow-mcp-js` | + `@modelcontextprotocol/sdk` | You want an MCP server |
+| `@particle-academy/fancy-flow-mcp-js/authoring` | **nothing** beyond `fancy-flow` | You want graph authoring and validation, no server |
+| `@particle-academy/fancy-flow-mcp-js` | + `@particle-academy/agent-integrations` | You want an MCP server |
 
 The core was written first and deliberately depends on nothing, so a host that
-only wants to build and validate graphs never pays for a transport it will not
-use.
+only wants to build and validate graphs never pays for a server it will not use.
+
+**No third-party runtime code, and no React.** The server is agent-integrations'
+first-party `MicroMcpServer`, imported from its headless `/mcp` subpath, which
+imports no package at all. (Until 0.2.0 it was `@modelcontextprotocol/sdk` —
+see the changelog for what changed and what did not.)
 
 ## Use it from a host
 
 ```ts
 import { createFlowServer, MemoryDraftStore } from "@particle-academy/fancy-flow-mcp-js";
-import { registerBuiltinKinds } from "@particle-academy/fancy-flow/registry";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-
-registerBuiltinKinds(); // the registry does not populate itself in a bare process
+import { attachStdio } from "@particle-academy/agent-integrations/mcp/stdio";
 
 const server = createFlowServer({
   store: new MemoryDraftStore(),
@@ -55,8 +56,20 @@ const server = createFlowServer({
     kind.name.includes("terminal") ? "This host has no terminal sessions." : null,
 });
 
-await server.connect(new StdioServerTransport());
+attachStdio(server); // stdin/stdout; log to stderr, never stdout
 ```
+
+Importing `@particle-academy/agent-integrations` yourself? Declare it in your own
+dependencies (`>=0.45 <2.0`) rather than relying on this package to bring it.
+
+There is no need to call `registerBuiltinKinds()`: the kind registry fills
+itself on first read. It is also the wrong import for a headless host —
+`@particle-academy/fancy-flow/registry` pulls in React.
+
+`createFlowServer` returns a transport-agnostic server. For anything other than
+stdio, attach any agent-integrations transport, or implement its two-member
+`Transport` (`send`, optional `close`) and hand each incoming frame to
+`server.receive(transport, frame)`.
 
 `MemoryDraftStore` is a convenience. Implement `DraftStore` (`list` / `get` /
 `save` / `remove`, sync or async) against your own storage and drafts survive a
@@ -107,7 +120,8 @@ absent parameter cannot be passed.
 
 Speaks **`2025-11-25`**, negotiating back to `2024-11-05` — the same family
 `laravel/mcp` speaks, which is what the PHP twin is built on, and what Claude
-Code and Codex speak.
+Code and Codex speak. `initialize` echoes any of those a client asks for and
+answers `2025-11-25` otherwise.
 
 It does **not** speak `2026-07-28`, the revision that removed `initialize` and
 made the protocol stateless. Neither does the PHP twin. If you need to be

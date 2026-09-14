@@ -25,9 +25,8 @@
 import { describe, expect, test } from "vitest";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createFlowServer, MemoryDraftStore } from "../src/server";
+import { connectClient } from "./support/client";
 
 const PHP_TOOLS_DIR = fileURLToPath(new URL("../../fancy-flow-mcp/src/Tools/", import.meta.url));
 const HAVE_SIBLING = existsSync(PHP_TOOLS_DIR);
@@ -46,12 +45,7 @@ function phpToolNames(): string[] {
 }
 
 async function nodeToolNames(): Promise<string[]> {
-
-  const server = createFlowServer({ store: new MemoryDraftStore() });
-  const client = new Client({ name: "parity", version: "0" });
-  const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();
-
-  await Promise.all([server.connect(serverSide), client.connect(clientSide)]);
+  const client = await connectClient(createFlowServer({ store: new MemoryDraftStore() }));
 
   return (await client.listTools()).tools.map((t) => t.name).sort();
 }

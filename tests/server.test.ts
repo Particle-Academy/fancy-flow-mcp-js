@@ -1,37 +1,33 @@
 /**
- * The MCP surface, driven through a REAL client over the SDK's in-memory
- * transport.
+ * The MCP surface, driven through a REAL client over agent-integrations'
+ * in-process transport (`support/client.ts`).
  *
  * These do not call the tool handlers directly. A handler that works when
  * invoked as a function proves nothing about whether it is *reachable* — the
  * defect this kit keeps finding is a thing that exists and is wired to nothing,
  * and calling the function by hand is exactly the test that cannot see it. So
  * every assertion here goes through `client.callTool`, which means the tool had
- * to be registered, named correctly, and have a schema the SDK would accept.
+ * to be registered, named correctly, and reached through JSON-RPC dispatch.
  *
  * The twin property is asserted separately in `parity.test.ts`: this file cares
  * that the tools WORK, that one cares that they are the same tools the PHP
  * server offers.
  */
 import { describe, expect, test } from "vitest";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createFlowServer, MemoryDraftStore } from "../src/server";
 import type { DraftStore } from "../src/authoring";
+import { connectClient, type TestClient } from "./support/client";
 
-/** A connected client/server pair over a paired in-memory transport. */
+/** A connected, initialized client for a fresh server. */
 async function connect(options: { store?: DraftStore; admits?: Parameters<typeof createFlowServer>[0]["admits"] } = {}) {
   const server = createFlowServer({ store: options.store ?? new MemoryDraftStore(), admits: options.admits });
-  const client = new Client({ name: "test", version: "0" });
-  const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();
-
-  await Promise.all([server.connect(serverSide), client.connect(clientSide)]);
+  const client = await connectClient(server);
 
   return { client, server };
 }
 
 /** Tool replies are pretty-printed JSON as text, matching the PHP twin. */
-async function call(client: Client, name: string, args: Record<string, unknown> = {}) {
+async function call(client: TestClient, name: string, args: Record<string, unknown> = {}) {
   const result = await client.callTool({ name, arguments: args });
   const content = (result.content as Array<{ type: string; text?: string }>)[0];
 
