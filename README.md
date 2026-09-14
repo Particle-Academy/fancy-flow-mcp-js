@@ -1,5 +1,7 @@
 # @particle-academy/fancy-flow-mcp-js
 
+[![Fancified](art/fancified.svg)](https://particle.academy)
+
 **MCP server that lets an agent author [fancy-flow](https://github.com/Particle-Academy/fancy-flow) workflows headlessly on a TypeScript host — the Node twin of [`fancy-flow-mcp`](https://github.com/Particle-Academy/fancy-flow-mcp) (Laravel).**
 
 Same 15 tools, same names, same arguments. An agent that learned to build graphs
