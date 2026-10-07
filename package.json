@@ -86,7 +86,8 @@
     "@particle-academy/agent-integrations": ">=0.45 <2.0"
   },
   "overrides": {
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.1",
+    "source-map-js": "^1.2.2"
   },
   "bin": {
     "fancy-flow-mcp-js": "./dist/stdio.js"
