@@ -12,6 +12,13 @@ claim is asserted by a test that reads the PHP source, not maintained by hand.
 npx @particle-academy/fancy-flow-mcp-js
 ```
 
+<!-- fancy-agents-note:start -->
+> **For agents.** This package is listed on the Fancy MCP catalog server at
+> `https://ui.particle.academy/mcp` (streamable HTTP, no API key; MCP id `fancy-ui`),
+> with install commands and docs, alongside the rest of the kit. How an agent
+> installs and uses this package is in [AGENTS.md](https://github.com/Particle-Academy/fancy-flow-mcp-js/blob/main/AGENTS.md).
+<!-- fancy-agents-note:end -->
+
 ## The split it is built around
 
 > **We own whether a graph is well-formed; the host owns whether it is allowed to run.**
